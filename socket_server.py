@@ -1,5 +1,5 @@
 import socket
-
+import os
 
 # Create a TCP/IP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -27,7 +27,13 @@ while True:
             connection.send('\n') # header and body should be separated by additional newline
             connection.send("""<html>
                         <body>
-                        <h1>Hello World</h1> this is my server!
+                        <h1>Hello World</h1>""")
+            connection.send("<ul>");
+            files = [f for f in os.listdir('.') if os.path.isfile(f)]
+            for f in files:
+                fileName = """<li> {0}</li>"""
+                connection.send(fileName.format(str(f)));
+            connection.send("""</ul>
                         </body>
                         </html>
                         """) # Use triple-quote string.
