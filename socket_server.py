@@ -18,7 +18,11 @@ while True:
         print ('connection from', client_address)
 
         # Receive the data in small chunks and retransmit it
-        data = connection.recv(16)
+        data = connection.recv(1024)
+        #GET={i.split("=")[0]:i.split("=")[1] for i in data.split("\n")[0].split(" ")[1][2:].split("&")}
+        print data
+        #   print connection.getpeername()
+        
         print ('received "%s"' % data)
         if data:
             print ('sending data back to the client')
@@ -29,19 +33,30 @@ while True:
                         <body>
                         <h1>Hello World</h1>""")
             connection.send("<ul>");
-            files = [f for f in os.listdir('.') if os.path.isfile(f)]
-            for f in files:
-                fileName = """<li> {0}</li>"""
-                connection.send(fileName.format(str(f)));
+            link = data.split(" ")[1];
+            print link
+            if "/" != link:
+                if "favicon.ico" not in data:
+                    path = os.path.join(os.getcwd(), link)
+                    print "**************************"+path
+            else:
+                path = os.getcwd();
+                print "-------------------"+path
+            for files in os.listdir(path):
+                print files
+                fname = os.path.join(path,files)
+                if os.path.isdir(fname):
+                    fileName = """<li><a href="{0}" >{0}</a></li>"""
+                else:
+                    fileName = """<li>{0}</li>"""
+                connection.send(fileName.format(fname));
             connection.send("""</ul>
                         </body>
                         </html>
                         """) # Use triple-quote string.
-
         else:
-            print ('no more data from', client_address)
-            break
-            
+            print("NO Data");
+            connection.close();
     finally:
     # Clean up the connection
             connection.close()
